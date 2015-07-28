@@ -19,11 +19,11 @@ from seq_reading import sequences_in_file
 
 SERVER = None
 
-seq = sequences_in_file("assets/sequences/kampy_full.fasta").next()
+seq = sequences_in_file("assets/sequences/patience_full.fasta").next()
 
 
 def play_music():
-    note_length = float(1.0/16)
+    note_length = float(1.0/10)
     envelope = Adsr(attack=note_length/4,
                  decay=note_length/4,
                  sustain=note_length/4,
@@ -31,9 +31,11 @@ def play_music():
                  dur=note_length,
                  mul=.5)
 
-    wave = SineLoop(1000, feedback=0.1, mul=envelope).out()
+    wave = None
 
     def each_note():
+        global wave
+        wave = SineLoop(1000, feedback=0.1, mul=envelope).out(dur=note_length)
         nucleo = seq.next()
         wave.freq = nucleotide_to_hz(nucleo)
         envelope.play()
