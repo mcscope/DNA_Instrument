@@ -23,7 +23,7 @@ seq = sequences_in_file("assets/sequences/kampy_full.fasta").next()
 
 
 def play_music():
-    note_length = 1/16
+    note_length = float(1.0/16)
     envelope = Adsr(attack=note_length/4,
                  decay=note_length/4,
                  sustain=note_length/4,
@@ -32,6 +32,7 @@ def play_music():
                  mul=.5)
 
     wave = SineLoop(1000, feedback=0.1, mul=envelope).out()
+
     def each_note():
         nucleo = seq.next()
         wave.freq = nucleotide_to_hz(nucleo)
