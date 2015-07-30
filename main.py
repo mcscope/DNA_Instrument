@@ -2,8 +2,9 @@ import sys
 import time
 from pyo import *
 
-from dna_to_music import nucleotide_to_hz
+from dna_to_music import nucleotide_to_instrument
 from seq_reading import sequences_in_file
+from music import make_instrument
 
 # Useful pyo example lines
 
@@ -24,6 +25,7 @@ seq = sequences_in_file("assets/sequences/patience_full.fasta").next()
 
 def play_music():
     note_length = float(1.0/10)
+
     envelope = Adsr(attack=note_length/4,
                  decay=note_length/4,
                  sustain=note_length/4,
@@ -31,13 +33,14 @@ def play_music():
                  dur=note_length,
                  mul=.5)
 
+    # we want this in the outer scope
     wave = None
 
     def each_note():
         global wave
-        wave = SineLoop(1000, feedback=0.1, mul=envelope).out(dur=note_length)
         nucleo = seq.next()
-        wave.freq = nucleotide_to_hz(nucleo)
+        instrument = nucleotide_to_instrument(nucleo)
+        wave = make_instrument(instrument, env=envelope, dur=note_length)
         envelope.play()
 
 
@@ -49,7 +52,8 @@ def play_music():
 
 def main():
     global SERVER
-    SERVER = Server().boot()
+    SERVER = Server()
+    SERVER.boot()
     SERVER.start()
 
     play_music()
